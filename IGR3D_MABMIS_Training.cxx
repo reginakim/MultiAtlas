@@ -214,7 +214,7 @@ int Training( itk::MABMISImageData* trainingData, std::string outputFile,
               std::vector<int> iterations, double sigma)
 {
   // sanity check
-	std::cout << "m_DataDirectory: " << trainingData->m_DataDirectory << std::endl;
+	//std::cout << "m_DataDirectory: " << trainingData->m_DataDirectory << std::endl;
   if( trainingData->m_SegmentationFileNames.size() != trainingData->m_ImageFileNames.size() )
     {
     std::cerr << "The numbers of image files and segmentation files are NOT equal!!!" << std::endl;
@@ -280,10 +280,10 @@ int Training( itk::MABMISImageData* trainingData, std::string outputFile,
 
     // copy
     std::string fromImagefile = trainingData->m_ImageFileNames[i];
-    if( !trainingData->m_DataDirectory.empty() )
-      {
-      fromImagefile  = ReplacePathSepForOS(trainingData->m_DataDirectory + trainingData->m_ImageFileNames[i]);
-      }
+    //if( !trainingData->m_DataDirectory.empty() )
+    //  {
+    //  fromImagefile  = ReplacePathSepForOS(trainingData->m_DataDirectory + trainingData->m_ImageFileNames[i]);
+    //  }
 	
     bool ret1=itksys::SystemTools::CopyFileAlways(fromImagefile.c_str(), imageFiles[i].c_str() );
 	if (!ret1) 
@@ -300,7 +300,7 @@ int Training( itk::MABMISImageData* trainingData, std::string outputFile,
       itksys::SystemTools::CopyFileAlways(fromfileImg.c_str(), tofileImg.c_str() );
       }
 
-    std::string fromSegfile = trainingData->m_DataDirectory + trainingData->m_SegmentationFileNames[i];
+    std::string fromSegfile = trainingData->m_SegmentationFileNames[i];
 
     bool ret2 = itksys::SystemTools::CopyFileAlways(fromSegfile.c_str(), segmentFiles[i].c_str() );
 	if (!ret1) 
@@ -342,6 +342,8 @@ int Training( itk::MABMISImageData* trainingData, std::string outputFile,
 
   std::cout << "---------------------------------------" << std::endl;
   std::cout << "3. Build statistical deformation model..." << std::endl;
+  std::cout<<__FILE__<<" : "<<__LINE__<<std::endl;
+  std::cout<<"simulatedAtlasSize: "<<simulatedAtlasSize<<std::endl;
   if( BuildStatisticalDeformationModel(root, imageFiles, simulatedAtlasSize) != 0 )
     {
     return -1;
@@ -415,7 +417,8 @@ int Training( itk::MABMISImageData* trainingData, std::string outputFile,
   itk::MABMISAtlas                       atlas;
   atlas.m_NumberAllAtlases = totalAtlasSize;
   atlas.m_NumberSimulatedAtlases = simulatedAtlasSize;
-  atlas.m_AtlasDirectory = std::string(".") + FILESEP + outputxmlname;
+  //TODO: AtlasDirectory --> OutputDirectory
+  atlas.m_AtlasDirectory = std::string(".");
   atlas.m_Tree.resize(tree_size);
   atlas.m_IsSimulatedImage.resize(tree_size);
   atlas.m_RealImageIDs.resize(totalAtlasSize - simulatedAtlasSize);
@@ -524,26 +527,26 @@ int main( int argc, char *argv[] )
   itk::MABMISImageData * trainingData = trainingXMLReader->GetOutputObject();
 
   // if the data path is empty, use the path of the xml file instead
-  if( trainingData->m_DataDirectory.size() <= 1 )
-    {
-    const size_t sep = TrainingDataXML.find_last_of(FILESEP);
-	//std::cout <<"sep=" << sep << std::endl;
-    if( sep != std::string::npos )
-      {
-      trainingData->m_DataDirectory = TrainingDataXML.substr(0, sep);
-      }
-    else
-      {
-      trainingData->m_DataDirectory.resize(0);
-      }
-    }
-  if( !trainingData->m_DataDirectory.empty() )
-    {
-    if( !(trainingData->m_DataDirectory[trainingData->m_DataDirectory.size() - 1] == FILESEP) )
-      {
-      trainingData->m_DataDirectory = trainingData->m_DataDirectory + FILESEP;
-      }
-    }
+  //if( trainingData->m_DataDirectory.size() <= 1 )
+  //  {
+  //  const size_t sep = TrainingDataXML.find_last_of(FILESEP);
+	////std::cout <<"sep=" << sep << std::endl;
+  //  if( sep != std::string::npos )
+  //    {
+  //    trainingData->m_DataDirectory = TrainingDataXML.substr(0, sep);
+  //    }
+  //  else
+  //    {
+  //    trainingData->m_DataDirectory.resize(0);
+  //    }
+  //  }
+  //if( !trainingData->m_DataDirectory.empty() )
+  //  {
+  //  if( !(trainingData->m_DataDirectory[trainingData->m_DataDirectory.size() - 1] == FILESEP) )
+  //    {
+  //    trainingData->m_DataDirectory = trainingData->m_DataDirectory + FILESEP;
+  //    }
+  //  }
   // Will look into getting rid of these global variables later ---Xiaofeng
   datasimulator = DataSimulatorType::New();
   imgoperator = ImageOperationFilterType::New();
@@ -703,14 +706,18 @@ int RegistrationBetweenRootandAtlases(int root, std::vector<std::string> imageFi
 
 int BuildStatisticalDeformationModel(int root,  std::vector<std::string> imageFileNames, int simulatedAtlasSize)
 {
+  std::cout<<__FILE__<<" : "<<__LINE__<<std::endl;
   ///////////////////////////////
   // do PCA simulation
-  // std::cout << "Build deformation field model ... ";
+  std::cout << "Build deformation field model ... ";
   std::vector<std::string> allDeformationFieldFileNames;
+  std::cout<<__FILE__<<" : "<<__LINE__<<std::endl;
 
   // get the path from the filename
   const size_t      sep = imageFileNames[0].find_last_of(FILESEP);
+  std::cout<<__FILE__<<" : "<<__LINE__<<std::endl;
   std::string outputFolder = "";
+  std::cout<<__FILE__<<" : "<<__LINE__<<std::endl;
   if( sep != std::string::npos )
     {
     outputFolder = imageFileNames[0].substr(0, sep);
@@ -719,12 +726,16 @@ int BuildStatisticalDeformationModel(int root,  std::vector<std::string> imageFi
     {
     outputFolder = outputFolder + FILESEP;
     }
+  std::cout<<__FILE__<<" : "<<__LINE__<<std::endl;
 
   int atlas_size = imageFileNames.size();
 
   datasimulator->SetRoot(root);
+  std::cout<<__FILE__<<" : "<<__LINE__<<std::endl;
   datasimulator->SetAtlasSize(atlas_size);
+  std::cout<<__FILE__<<" : "<<__LINE__<<std::endl;
   datasimulator->SetSimulateSize(simulatedAtlasSize);
+  std::cout<<__FILE__<<" : "<<__LINE__<<std::endl;
   for( int i = 0; i < atlas_size; ++i )
     {
     if( i == root )
@@ -741,6 +752,7 @@ int BuildStatisticalDeformationModel(int root,  std::vector<std::string> imageFi
     allDeformationFieldFileNames.push_back(deformationFieldFileName);
     }
 
+  std::cout<<__FILE__<<" : "<<__LINE__<<std::endl;
   return datasimulator->DoPCATraining(allDeformationFieldFileNames, atlas_size - 1, imageFileNames, root);
 }
 

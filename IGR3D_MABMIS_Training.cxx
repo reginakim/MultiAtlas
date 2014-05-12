@@ -184,8 +184,10 @@ typedef itk::ImageFileWriter<ShortDeformationFieldType>  ShortDeformationFieldWr
 
 void SearchRootAmongAtlases(std::vector<std::string> imgfilenames, int & root);
 
-int RegistrationBetweenRootandAtlases(int root, std::vector<std::string> imageFileNames, std::vector<int> iterations,
-                                      double sigma);
+int RegistrationBetweenRootandAtlases(int root, 
+    std::vector<std::string> imageFileNames, 
+    std::vector<int> iterations,
+    double sigma);
 
 int BuildStatisticalDeformationModel(int root,  std::vector<std::string> imageFileNames, int simulatedAtlasSize);
 
@@ -213,6 +215,9 @@ void strtrim(std::string& str)
 int Training( itk::MABMISImageData* trainingData, std::string outputFile,
               std::vector<int> iterations, double sigma)
 {
+  //TODO
+  //Change outputDir to member variable or something
+  std::string outputDir=".";
   // sanity check
 	//std::cout << "m_DataDirectory: " << trainingData->m_DataDirectory << std::endl;
   if( trainingData->m_SegmentationFileNames.size() != trainingData->m_ImageFileNames.size() )
@@ -275,18 +280,20 @@ int Training( itk::MABMISImageData* trainingData, std::string outputFile,
   std::vector<std::string> segmentFiles(trainingData->m_NumberImageData);
   for( int i = 0; i < imageFiles.size(); ++i )
     {
-    imageFiles[i] = ReplacePathSepForOS(atlasFolder + trainingData->m_ImageFileNames[i]);
-    segmentFiles[i] = ReplacePathSepForOS(atlasFolder + trainingData->m_SegmentationFileNames[i]);
+    //imageFiles[i] = ReplacePathSepForOS(atlasFolder + trainingData->m_ImageFileNames[i]);
+    //segmentFiles[i] = ReplacePathSepForOS(atlasFolder + trainingData->m_SegmentationFileNames[i]);
+    imageFiles[i] = ReplacePathSepForOS(atlasFolder + "trainingImage_" + std::to_string(i) + "th.nii.gz");
+    segmentFiles[i] = ReplacePathSepForOS(atlasFolder +"trainingImage_" + std::to_string(i) + "th_seg.nii.gz") ;
 
     // copy
     std::string fromImagefile = trainingData->m_ImageFileNames[i];
-    //if( !trainingData->m_DataDirectory.empty() )
-    //  {
-    //  fromImagefile  = ReplacePathSepForOS(trainingData->m_DataDirectory + trainingData->m_ImageFileNames[i]);
-    //  }
+    if( !trainingData->m_DataDirectory.empty() )
+      {
+      fromImagefile  = ReplacePathSepForOS(trainingData->m_DataDirectory + trainingData->m_ImageFileNames[i]);
+      }
 	
     bool ret1=itksys::SystemTools::CopyFileAlways(fromImagefile.c_str(), imageFiles[i].c_str() );
-	if (!ret1) 
+	  if (!ret1) 
       {
 	  std::cerr << "ERROR: Cannot copy atlas image file to trained atlas folder!" << std::endl;
 	  return -1;
@@ -302,11 +309,13 @@ int Training( itk::MABMISImageData* trainingData, std::string outputFile,
 
     std::string fromSegfile = trainingData->m_SegmentationFileNames[i];
 
+    std::cout<<"Copy from "<< fromSegfile << std::endl;
+    std::cout<<"     to "  << segmentFiles[i].c_str() << std::endl;
     bool ret2 = itksys::SystemTools::CopyFileAlways(fromSegfile.c_str(), segmentFiles[i].c_str() );
-	if (!ret1) 
+	  if (!ret2) 
       {
-	  std::cerr << "ERROR: Cannot copy atlas image file to trained atlas folder!" << std::endl;
-	  return -1;
+	    std::cerr << "ERROR: Cannot copy atlas image file to trained atlas folder!" << std::endl;
+	    return -1;
       }
     // if file extension is '.nii.gz', also copy the 'img file'
     if( itksys::SystemTools::Strucmp(fromSegfile.substr(fromSegfile.size() - 3, 3).c_str(), "hdr") == 0 )
@@ -316,7 +325,6 @@ int Training( itk::MABMISImageData* trainingData, std::string outputFile,
       itksys::SystemTools::CopyFileAlways(fromfileImg.c_str(), tofileImg.c_str() );
       }
     }
-
   // step 1: find root of the atlas
   std::cout << "---------------------------------------" << std::endl;
   std::cout << "1. Find root atlas ... " << std::endl;;
@@ -603,8 +611,10 @@ void SearchRootAmongAtlases(std::vector<std::string> imgfilenames, int & root)
   std::cout << "The root is " << root << ": " << imgfilenames[root] << ". " << std::endl;
 }
 
-int RegistrationBetweenRootandAtlases(int root, std::vector<std::string> imageFileNames,
-                                      std::vector<int> iterations, double sigma)
+int RegistrationBetweenRootandAtlases(int root, 
+    std::vector<std::string> imageFileNames,
+    std::vector<int> iterations, 
+    double sigma)
 {
   // get the path from the filename
   const size_t      sep = imageFileNames[0].find_last_of(FILESEP);
@@ -619,6 +629,7 @@ int RegistrationBetweenRootandAtlases(int root, std::vector<std::string> imageFi
     outputFolder = outputFolder + FILESEP;
     }
 
+  std::cout<<"OutputFolder is .. "<<outputFolder<<std::endl;
   const int atlas_size = imageFileNames.size();
   std::cout << "Register between root and atlases ... " << std::endl;
   for( int i = 0; i < atlas_size; ++i )
@@ -787,6 +798,8 @@ std::vector<std::string> GenerateSimulatedData(int root, std::vector<std::string
     simulateDeformationFieldFileName = outputFolder + simulateDeformationFieldFileName;
     simulateTemplateFileName = outputFolder + simulateTemplateFileName;
 
+    std::cout<<"simulateDeformationFieldFileName :: "<<simulateDeformationFieldFileName <<std::endl;
+    std::cout<<"simulateTemplateFileName :: "<<simulateTemplateFileName << std::endl;
     simulateDeformationFieldFileNames.push_back(simulateDeformationFieldFileName);
     simulateTemplateFileNames.push_back(simulateTemplateFileName);
 

@@ -176,6 +176,8 @@ MABMISDeformationFieldFilter<TInputImage, TOutputImage>
 
   ApplyDeformationField(movingImage, deformationField, deformedImage, isLinearInterpolator);
 
+  std::cout<<__FILE__<<"::"<<__LINE__<<std::endl;
+  std::cout<<"deformedImageName:: "<<deformedImageName<<std::endl;
   imageoperator->WriteImage(deformedImageName, deformedImage);
 }
 
@@ -258,6 +260,7 @@ MABMISDeformationFieldFilter<TInputImage, TOutputImage>
   deformationFieldWriter->SetFileName( filename );
   deformationFieldWriter->SetInput(deformationfield);
   deformationFieldWriter->SetUseCompression( false );
+  std::cout<<"WriteDeformationField:: "<< filename << std::endl;
   try
     {
     deformationFieldWriter->Update();

@@ -42,6 +42,7 @@ MABMISSimulateData<TInputImage, TOutputImage>
 ::DoPCATraining(std::vector<std::string> deformationFieldFileNames, int numFiles,
                 std::vector<std::string> allImgFileName, int root)
 {
+  std::cout<<__FILE__<<" : "<<__LINE__<<std::endl;
   bool doPCATraining = true;
   int  sampleRate = 2;
   bool doResampleDeformationField = true;
@@ -53,6 +54,7 @@ MABMISSimulateData<TInputImage, TOutputImage>
 
   float* c = NULL;
 
+  std::cout<<__FILE__<<" : "<<__LINE__<<std::endl;
   if( numSampleEachDirection >= 3 && numSampleEachDirection <= 5 )
     {
     c = new float[numSampleEachDirection];
@@ -66,6 +68,7 @@ MABMISSimulateData<TInputImage, TOutputImage>
     std::cerr << "The number of samples on each eigen vector direction should be between 3 and 5!" << std::endl;
     exit(1);
     }
+  std::cout<<__FILE__<<" : "<<__LINE__<<std::endl;
   // some global parameters
   // SVD   (Vt == V^T,transpose; Si = inv(S), inverse)
   // D = U S Vt   =>  DV = US => DVSi = U
@@ -184,7 +187,7 @@ MABMISSimulateData<TInputImage, TOutputImage>
   itksys::SystemTools::MakeDirectory(tempFolder.c_str() );
 
   // output folder, after selection of simulated atlases
-  std::string outputFolder = "";
+  std::string outputFolder = ".";
   const size_t      sep = allImgFileName[0].find_last_of(FILESEP);
   if( sep != std::string::npos )
     {

@@ -160,6 +160,7 @@ MABMISImageDataXMLFileReader::CharacterDataHandler(const char *inData, int inLen
     }
   //m_CurCharacterData = StripLastNewline(m_CurCharacterData);
   m_CurCharacterData = trim(m_CurCharacterData);
+  std::cout<<"m_CurCharacterData:: "<<m_CurCharacterData<<std::endl;
 }
 
 ///------------------------------------------------------------
@@ -324,6 +325,7 @@ MABMISAtlasXMLFileReader::EndElement(const char *name)
       RAISE_EXCEPTION("The xml format is not right");
       }
     }
+  //TODO AtlasDirectory --> OutputDirectory
   if( itksys::SystemTools::Strucmp(name, "AtlasDirectory") == 0 )
     {
 		this->m_Atlas->m_AtlasDirectory = this->m_CurCharacterData;

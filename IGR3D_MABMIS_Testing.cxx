@@ -308,6 +308,7 @@ int Testing(itk::MABMISImageData* imageData, itk::MABMISAtlas* atlasTree,
   std::vector<std::string> allfilenames(totalNumFiles);
   for( int i = 0; i < totalNumFiles; ++i )
     {
+    std::cout<<"atlasTree->m_AtlasDirectory::"<<atlasTree->m_AtlasDirectory<<std::endl;
 		
     if( i < totalNumAtlases )
       {
@@ -317,6 +318,7 @@ int Testing(itk::MABMISImageData* imageData, itk::MABMISAtlas* atlasTree,
       {
       allfilenames[i] = ReplacePathSepForOS(imageData->m_DataDirectory + imageData->m_ImageFileNames[i - totalNumAtlases]);
       }
+    std::cout<<"allfilenames ["<<i<<"]"<<allfilenames[i]<<std::endl;
     }
 
   std::cout << "---------------------------------------" << std::endl;
@@ -562,7 +564,7 @@ int main( int argc, char *argv[] )
     const size_t dir_sep = ImageListXML.find_last_of(FILESEP);
     if( dir_sep != std::string::npos )
       {
-      inputImageData->m_DataDirectory = ImageListXML.substr(0, dir_sep);
+      inputImageData->m_DataDirectory = "";//ImageListXML.substr(0, dir_sep);
       }
     else
       {
@@ -580,7 +582,7 @@ int main( int argc, char *argv[] )
   // output directory
   if( OutputFolder.empty() )
     {
-    inputImageData->m_OutputDirectory = inputImageData->m_DataDirectory;
+    inputImageData->m_OutputDirectory = ".";//inputImageData->m_DataDirectory;
     }
   else
     {
@@ -610,7 +612,7 @@ int main( int argc, char *argv[] )
   const size_t dir_sep = AtlaseTreeXML.find_last_of(FILESEP);
   if( dir_sep != std::string::npos )
     {
-    atlasTree->m_AtlasDirectory = ReplacePathSepForOS(AtlaseTreeXML.substr(0, dir_sep + 1) + atlasTree->m_AtlasDirectory);
+    atlasTree->m_AtlasDirectory = ReplacePathSepForOS(atlasTree->m_AtlasDirectory);
     }
 
   if( atlasTree->m_AtlasDirectory.size() == 0 )

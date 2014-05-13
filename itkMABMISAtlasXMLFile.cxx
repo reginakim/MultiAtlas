@@ -329,6 +329,8 @@ MABMISAtlasXMLFileReader::EndElement(const char *name)
   if( itksys::SystemTools::Strucmp(name, "AtlasDirectory") == 0 )
     {
 		this->m_Atlas->m_AtlasDirectory = this->m_CurCharacterData;
+    std::cout<<__FILE__<<"::"<<__LINE__<<std::endl;
+    std::cout<<"m_AtlasDirectory::"<<this->m_Atlas->m_AtlasDirectory<<std::endl;
     }
   if( itksys::SystemTools::Strucmp(name, "NumberOfAtlases") == 0 )
     {

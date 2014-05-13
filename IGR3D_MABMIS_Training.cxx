@@ -426,7 +426,8 @@ int Training( itk::MABMISImageData* trainingData, std::string outputFile,
   atlas.m_NumberAllAtlases = totalAtlasSize;
   atlas.m_NumberSimulatedAtlases = simulatedAtlasSize;
   //TODO: AtlasDirectory --> OutputDirectory
-  atlas.m_AtlasDirectory = std::string(".");
+  //atlas.m_AtlasDirectory = std::string(".");
+  atlas.m_AtlasDirectory = atlasFolder;
   atlas.m_Tree.resize(tree_size);
   atlas.m_IsSimulatedImage.resize(tree_size);
   atlas.m_RealImageIDs.resize(totalAtlasSize - simulatedAtlasSize);
